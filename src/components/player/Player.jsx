@@ -62,8 +62,10 @@ function Player(props) {
     }
 
     function stopSound() {
-        if(sound)
+        if(sound) {
             sound.stop();
+            setElapsedTime(0);
+        }
     }
 
     function seekForward() {
@@ -111,6 +113,13 @@ function Player(props) {
         }
     }
 
+    function handleSeekChange(event) {
+        if(sound) {
+            sound.seek(event.target.value);
+            setElapsedTime(event.target.value);
+        }
+    } 
+
     return <>
         <p>Input URL for sound:</p>
         <input type="text" id="mediaUrl" onChange={(e) => setMediaUrl(e.target.value) } value={mediaUrl}/>
@@ -136,6 +145,10 @@ function Player(props) {
 
         <br />
         <p>Time: {elapsedTime} / {duration}</p>
+
+        <br />
+        <p>Progress Bar</p>
+        <input type="range" name="progressbar" id="progressbar" min={0} max={duration} onChange={handleSeekChange} value={elapsedTime} step={0.01}/>
     </>;
 }
 
