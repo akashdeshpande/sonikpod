@@ -1,21 +1,45 @@
 import { Howl } from "howler";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Player(props) {
 
     // https://howlerjs.com/assets/howler.js/examples/player/audio/rave_digger.webm
+    // https://howlerjs.com/assets/howler.js/examples/player/audio/80s_vibe.webm
 
     const [mediaUrl, setMediaUrl] = useState("");
     const [sound, setSound] = useState(null);
     const [volume, setVolume] = useState(1.0);
     const [speed, setSpeed] = useState(1.0);
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [renderInterval, setRenderInterval] = useState(null);
+
+    useEffect( () => {
+        
+        if(renderInterval) {
+            clearInterval(renderInterval);
+        }
+        const interval = setInterval( () => {
+            if(sound && sound.playing()) {
+                setElapsedTime(sound.seek());
+                setDuration(sound.duration());
+            }
+        }, 100);
+
+        setRenderInterval(interval);
+
+        return () => {
+            clearInterval(renderInterval);
+        }
+
+    }, [sound])
 
     function playSound() {
-        if(sound) {
+        if(sound && !sound.playing()) {
             sound.play();
         }
             
-        else {
+        else if(mediaUrl != ""){
             const sound = new Howl({
                 src: mediaUrl,
                 preload: true,
@@ -27,6 +51,8 @@ function Player(props) {
             setSound(sound);
 
             sound.play();
+        } else {
+            console.error("Can't play! media url is empty", mediaUrl);
         }
     }
 
@@ -64,9 +90,31 @@ function Player(props) {
             sound.rate(event.target.value)  
     }
 
+    function handleLoadSong() {
+        if(sound) {
+            if(sound.playing())
+                sound.stop();
+            
+            const newSound = new Howl({
+                src: mediaUrl,
+                preload: true,
+                onend: () => console.log("playback finished"),
+                onloaderror: (id, error) => console.error("Error loading sound source: ", error ),
+                html5: true
+            });
+
+            setSound(newSound); 
+
+            newSound.play();
+        } else {
+            playSound();
+        }
+    }
+
     return <>
         <p>Input URL for sound:</p>
         <input type="text" id="mediaUrl" onChange={(e) => setMediaUrl(e.target.value) } value={mediaUrl}/>
+        <button onClick={handleLoadSong}>Load</button>
 
 
         <br />
@@ -85,6 +133,9 @@ function Player(props) {
         <br />
         <p>Speed: {speed}x</p>
         <input type="range" name="speed" id="speed" value={speed} onChange={handleSpeedChange} min={0.5} max={4.0} step={0.5}/>
+
+        <br />
+        <p>Time: {elapsedTime} / {duration}</p>
     </>;
 }
 
