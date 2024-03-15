@@ -118,7 +118,18 @@ function Player(props) {
             sound.seek(event.target.value);
             setElapsedTime(event.target.value);
         }
-    } 
+    }
+    
+    function formatTime(timeInSec) {
+        let hours = Math.floor(timeInSec / 3600);
+        let minutes = Math.floor(timeInSec / 60);
+        let seconds = Math.floor(timeInSec % 60);
+        if(Math.floor(duration / 60) > 60) {
+            minutes = minutes % 60;
+            return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+        return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
 
     return <>
         <p>Input URL for sound:</p>
@@ -144,7 +155,7 @@ function Player(props) {
         <input type="range" name="speed" id="speed" value={speed} onChange={handleSpeedChange} min={0.5} max={4.0} step={0.5}/>
 
         <br />
-        <p>Time: {elapsedTime} / {duration}</p>
+        <p>Time: {formatTime(elapsedTime)} / {formatTime(duration)}</p>
 
         <br />
         <p>Progress Bar</p>
