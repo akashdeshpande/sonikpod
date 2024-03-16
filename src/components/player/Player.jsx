@@ -152,7 +152,7 @@ function Player(props) {
 
         <br />
         <p>Speed: {speed}x</p>
-        <input type="range" name="speed" id="speed" value={speed} onChange={handleSpeedChange} min={0.5} max={4.0} step={0.5}/>
+        <input type="range" name="speed" id="speed" value={speed} onChange={handleSpeedChange} min={0.5} max={4.0} step={0.1}/>
 
         <br />
         <p>Time: {formatTime(elapsedTime)} / {formatTime(duration)}</p>
