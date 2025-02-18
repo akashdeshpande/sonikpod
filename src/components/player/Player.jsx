@@ -32,25 +32,29 @@ function Player(props) {
             clearInterval(renderInterval);
         }
 
-    }, [sound])
+    }, [sound]);
+    
+    function createSound() {
+        return new Howl({
+            src: mediaUrl,
+            preload: true,
+            onend: () => console.log("playback finished"),
+            onloaderror: (id, error) => console.error("Error loading sound source: ", error),
+            html5: true
+        });
+    }
 
     function playSound() {
-        if(sound && !sound.playing()) {
+        if(sound) {
+            if(sound.playing()) {
+                sound.stop();
+            }
             sound.play();
-        }
-            
-        else if(mediaUrl != ""){
-            const sound = new Howl({
-                src: mediaUrl,
-                preload: true,
-                onend: () => console.log("playback finished"),
-                onloaderror: (id, error) => console.error("Error loading sound source: ", error ),
-                html5: true
-            });
-
+        } else if(mediaUrl != ""){
+            const sound = createSound();
             setSound(sound);
-
             sound.play();
+            console.log("creating new sound.")
         } else {
             console.error("Can't play! media url is empty", mediaUrl);
         }
@@ -97,16 +101,8 @@ function Player(props) {
             if(sound.playing())
                 sound.stop();
             
-            const newSound = new Howl({
-                src: mediaUrl,
-                preload: true,
-                onend: () => console.log("playback finished"),
-                onloaderror: (id, error) => console.error("Error loading sound source: ", error ),
-                html5: true
-            });
-
+            const newSound = createSound();
             setSound(newSound); 
-
             newSound.play();
         } else {
             playSound();
